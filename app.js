@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const coursesRoute = require('./routes/courses-routes');
-const budgetsRoutes = require('./routes/budgets-routes');
+const mongodbService = require('./services/mongodb-service');
 const cors = require('cors');
 
 const app = express();
@@ -13,9 +13,12 @@ const allowOrigin = {
 
 
 app.use(bodyParser.json());
+app.use(cors(allowOrigin));
 
 app.use('/api/courses', coursesRoute);
-app.use('/api/budgets', cors(allowOrigin), budgetsRoutes);
+app.get('/api/budgets', mongodbService.getBudgets);
+app.post('/api/budgets', mongodbService.createBudget);
+
 
 app.post('/', (req, res, next) => {
     return res.send('<h1>hello, ' + req.body.username +'</h1>');

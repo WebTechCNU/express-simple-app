@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 
 const createBudget = async (req, res, next) => {
-    const {name, description} = req.body;
+    const { name, description } = req.body;
     const newBudget = {
         name: name,
         description: description
@@ -17,7 +17,7 @@ const createBudget = async (req, res, next) => {
         budgets = await db.collection('budgets').find().toArray();
     } catch (error) {
         console.log(error);
-        return res.json( {message: 'Could not connect to the database' });
+        return res.json({ message: 'Could not connect to the database' });
     }
 
     await client.close();
@@ -30,13 +30,43 @@ const getBudgets = async (req, res, next) => {
 
     let budgets;
 
-    try{
+    try {
         await client.connect();
         const db = client.db('new_budgets');
+
         budgets = await db.collection('budgets').find().toArray();
-    } catch(error){
+
+    } catch (error) {
         console.log(error);
-        return res.json( {message: 'Could not connect to the database' });
+        return res.json({ message: 'Could not connect to the database' });
+    }
+
+    await client.close();
+
+    return res.json(budgets);
+}
+
+const getBudgetsFiltered = async (req, res, next) => {
+    const client = new MongoClient(process.env.connection_string);
+
+    const { description } = req.query;
+
+    let budgets;
+
+    try {
+        await client.connect();
+        const db = client.db('new_budgets');
+        if (description) {
+            budgets = await db.collection('budgets')
+                .find().toArray().where(b => b.description === description);
+        }
+        else {
+            budgets = await db.collection('budgets').find().toArray();
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.json({ message: 'Could not connect to the database' });
     }
 
     await client.close();
@@ -46,3 +76,4 @@ const getBudgets = async (req, res, next) => {
 
 exports.createBudget = createBudget;
 exports.getBudgets = getBudgets;
+exports.getBudgetsFiltered = getBudgetsFiltered;

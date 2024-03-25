@@ -11,7 +11,7 @@ let cache = apicache.middleware;
 const app = express();
 
 const allowOrigin = {
-    origin: 'http://localhost:3000'
+    origin: 'http://127.0.0.1:5500'
 };
 
 
